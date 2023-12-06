@@ -18,7 +18,7 @@ class ChangeStateWorker(
     override suspend fun doWork(): Result {
         Log.i(TAG, "doWork")
 
-        Repository.count = Repository.count + 1
+        Repository.count.value = Repository.count.value + 1
 
         // Fetch data or do some work and then update all instance of your widget
         MyAppWidget().updateAll(context)

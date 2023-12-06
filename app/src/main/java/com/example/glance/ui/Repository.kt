@@ -1,5 +1,6 @@
 package com.example.glance.ui
 
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -9,7 +10,7 @@ object Repository {
     const val SUCCESS = "SUCCESS"
     const val ERROR = "ERROR"
 
-    var count: Int = 0
+    var count = mutableStateOf(0)
 
     fun getStates(): Flow<String> {
         return flow {

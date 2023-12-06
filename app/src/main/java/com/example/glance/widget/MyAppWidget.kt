@@ -1,12 +1,11 @@
 package com.example.glance.widget
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.glance.Button
@@ -21,6 +20,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartService
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -38,6 +38,7 @@ import com.example.glance.ui.Repository
 import com.example.glance.ui.Repository.ERROR
 import com.example.glance.ui.Repository.LOADING
 import com.example.glance.ui.Repository.SUCCESS
+import kotlinx.coroutines.launch
 
 class MyAppWidget : GlanceAppWidget() {
     companion object {
@@ -94,47 +95,64 @@ class MyAppWidget : GlanceAppWidget() {
 
     @Composable
     private fun SuccessContent(repository: Repository) {
-        var count by remember { mutableStateOf(repository.count) }
+        var count by remember { repository.count }
 
-        Column(
+        val scope = rememberCoroutineScope()
+
+        // Make column to be scrollable
+        LazyColumn(
             modifier = GlanceModifier.fillMaxSize(),
-            verticalAlignment = Alignment.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                provider = ImageProvider(R.drawable.ic_launcher_foreground),
-                modifier = GlanceModifier.clickable(
-                    onClick = actionRunCallback<RefreshAction>(
-                        parameters = actionParametersOf(DESTINATION_KEY to "go")
-                    )
-                ),
-                contentDescription = "Refresh"
-            )
-
-            Text(text = "Where to?", modifier = GlanceModifier.padding(12.dp))
-            Row(horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(
-                    text = "Go Home",
-                    onClick = actionStartActivity<MainActivity>()
-                )
-                Button(
-                    text = "Work",
-                    onClick = actionStartActivity<MainActivity>()
-                )
-                Button(
-                    text = "Sync",
-                    onClick = actionStartService<SyncService>(isForegroundService = true)
+            item {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_launcher_foreground),
+                    modifier = GlanceModifier.clickable(
+                        onClick = actionRunCallback<RefreshAction>(
+                            parameters = actionParametersOf(DESTINATION_KEY to "go")
+                        )
+                    ),
+                    contentDescription = "Refresh"
                 )
             }
 
-            Text(
-                text = "counting ${count}",
-                modifier = GlanceModifier.padding(30.dp)
-            )
+            item {
+                Text(text = "Where to?", modifier = GlanceModifier.padding(12.dp))
+            }
 
-            Button(text = "Refresh", onClick = {
-                count = repository.count
-            })
+            item {
+                Row(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Button(
+                        text = "Go Home",
+                        onClick = actionStartActivity<MainActivity>()
+                    )
+                    Button(
+                        text = "Work",
+                        onClick = actionStartActivity<MainActivity>()
+                    )
+                    Button(
+                        text = "Sync",
+                        onClick = actionStartService<SyncService>(isForegroundService = true)
+                    )
+                }
+            }
+
+            item {
+                Text(
+                    text = "counting ${count}",
+                    modifier = GlanceModifier.padding(30.dp)
+                )
+
+            }
+
+            item {
+                Button(text = "Refresh", onClick = {
+                    scope.launch {
+                        count
+                    }
+
+                })
+            }
         }
     }
 }
