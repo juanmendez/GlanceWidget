@@ -6,12 +6,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalSize
@@ -32,6 +32,7 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.material3.ColorProviders
 import androidx.glance.text.Text
 import com.example.glance.R
 import com.example.glance.SyncService
@@ -41,6 +42,8 @@ import com.example.glance.ui.Repository
 import com.example.glance.ui.Repository.ERROR
 import com.example.glance.ui.Repository.LOADING
 import com.example.glance.ui.Repository.SUCCESS
+import com.example.glance.ui.theme.DarkColorScheme
+import com.example.glance.ui.theme.LightColorScheme
 import kotlinx.coroutines.launch
 
 class MyAppWidget : GlanceAppWidget() {
@@ -69,7 +72,15 @@ class MyAppWidget : GlanceAppWidget() {
 
         provideContent {
             // create your AppWidget here
-            MyContent()
+            GlanceTheme(
+                colors = ColorProviders(
+                    light = LightColorScheme,
+                    dark = DarkColorScheme
+                ),
+            ) {
+                MyContent()
+            }
+
         }
     }
 
